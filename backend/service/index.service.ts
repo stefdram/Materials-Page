@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { User } from "../controllers/index.controller";
+import { User } from "../controllers/login.controller";
 
 export const loginUser = async (user: User) => {
   // jwt token provision

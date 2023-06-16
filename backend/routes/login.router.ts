@@ -7,7 +7,7 @@ import {
   deleteUser,
   login,
   protect,
-} from "../controllers/index.controller";
+} from "../controllers/login.controller";
 import passport from "passport";
 import "../config/passport";
 
