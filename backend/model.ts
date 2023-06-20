@@ -15,6 +15,26 @@ export const pool = new Pool({
   port: port,
 });
 
+// Create "users" table query if not exists
+const createUserTableQuery = `
+  CREATE TABLE IF NOT EXISTS users (
+    nik SERIAL PRIMARY KEY,
+    name text,
+    password text
+  );
+`;
+
+(async () => {
+  const client = await pool.connect();
+  try {
+    await client.query(createUserTableQuery);
+  } catch (error) {
+    console.error("Error creating users table:", error);
+  } finally {
+    client.release();
+  }
+})();
+
 // Material database
 const portStringMaterial: string | undefined = process.env.DB_MATERIAL_PORT;
 const port2: number = portStringMaterial
@@ -28,3 +48,24 @@ export const poolMaterial = new Pool({
   password: process.env.DB_MATERIAL_PASSWORD,
   port: port2,
 });
+
+// Create "materials" table query if not exists
+const createMaterialTableQuery = `
+  CREATE TABLE IF NOT EXISTS materials (
+    id integer,
+    name text,
+    user_nik integer,
+    date_added timestamp
+  );
+`;
+
+(async () => {
+  const client = await poolMaterial.connect();
+  try {
+    await client.query(createMaterialTableQuery);
+  } catch (error) {
+    console.error("Error creating materials table:", error);
+  } finally {
+    client.release();
+  }
+})();
