@@ -12,6 +12,10 @@ const LoginScreen = () => {
   const submitHandler = async (e: SyntheticEvent) => {
     e.preventDefault();
     // interact with the backend using fetch
+    if (NIK === "" || password === "") {
+      setError("Please fill in all fields!");
+      return;
+    }
     const response = await fetch("http://localhost:4000/users/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -33,8 +37,8 @@ const LoginScreen = () => {
     const data = await response.json();
     const token = data.token;
     console.log(token);
-    localStorage.setItem('token', token);
-    localStorage.setItem('NIK', NIK);
+    localStorage.setItem("token", token);
+    localStorage.setItem("NIK", NIK);
     setNIK("");
     setPassword("");
     navigate("/materials");
@@ -62,7 +66,15 @@ const LoginScreen = () => {
             type="password"
             placeholder="Password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              const inputValue = e.target.value;
+              if (inputValue.includes(" ")) {
+                setError("Password cannot contain spaces!");
+              } else {
+                setError("");
+                setPassword(inputValue);
+              }
+            }}
           />
         </Form.Group>
         <Button variant="primary" type="submit">
