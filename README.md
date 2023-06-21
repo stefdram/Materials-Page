@@ -18,9 +18,9 @@ DB_MATERIAL_PASSWORD="yourpassword"
 DB_MATERIAL_PORT="yourportnumber"
 ```
 
-2. Change the working directory to backend and then execute npm start / npm run start command in the terminal.
+2. Change the working directory to backend. Execute "npm install" in terminal to install all relevant dependencies. Then, execute npm start / npm run start command in the terminal.
 
-3. Add a new terminal and then change the working directory to frontend. Then, execute npm start / npm run start command in the terminal.
+3. Add a new terminal and then change the working directory to frontend. Execute "npm install" in terminal to install all relevant dependencies. Then, execute npm start / npm run start command in the terminal.
 
 4. Go to http://localhost:3000 to see the webpage. 
 
