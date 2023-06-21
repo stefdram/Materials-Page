@@ -13,6 +13,10 @@ const SignupScreen = () => {
   const submitHandler = async (e: SyntheticEvent) => {
     e.preventDefault();
     // interact with the backend
+    if (name === "" || NIK === "" || password === "") {
+      setError("Please fill in all fields!");
+      return;
+    }
     const response = await fetch("http://localhost:4000/users/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -67,7 +71,15 @@ const SignupScreen = () => {
               type="password"
               placeholder="Password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                const inputValue = e.target.value;
+                if (inputValue.includes(" ")) {
+                  setError("Password cannot contain spaces!");
+                } else {
+                  setError("");
+                  setPassword(inputValue);
+                }
+              }}
             />
           </Form.Group>
           <Button variant="primary" type="submit">
