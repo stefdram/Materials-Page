@@ -1,25 +1,25 @@
 import { Request, Response } from "express";
-import { pool } from "../model";
-import { QueryResult } from "pg";
-import bcrypt from "bcrypt";
-import { loginUser } from "../service/index.service";
+import {
+  findAllUsers,
+  findUser,
+  passwordHash,
+  createUser,
+  editUser,
+  eraseUser,
+  comparePassword,
+  generateToken,
+} from "../service/login.service";
 
-export interface User {
-  nik: number;
-  name: string;
-  password: string;
-}
 
 export const getUsers = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
   try {
-    const response: QueryResult = await pool.query("SELECT * FROM users");
-    return res.status(200).json(response.rows);
+    const allUsers = await findAllUsers();
+    return res.status(200).json(allUsers);
   } catch (e) {
-    console.log(e);
-    return res.status(500).json("Internal Server Error");
+    return res.status(500).json("Internal Server Error: " + e);
   }
 };
 
@@ -28,36 +28,37 @@ export const getUserByNik = async (
   res: Response
 ): Promise<Response> => {
   const nik = parseInt(req.params.nik);
-  const response: QueryResult = await pool.query(
-    "SELECT * FROM users WHERE nik = $1",
-    [nik]
-  );
-  if (response.rowCount == 0) {
+  const user = await findUser(nik);
+  if (user.length === 0) {
     return res.status(400).send("User unavailable");
   }
-  return res.json(response.rows);
+  return res.status(200).json(user[0]);
 };
 
-export const createUser = async (
+export const signupUser = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
   const { name, nik, password } = req.body;
-  const checkUser = await pool.query("SELECT * FROM users WHERE nik = $1", [
-    nik,
-  ]);
-  if (checkUser.rowCount != 0) {
+  const checkUser = await findUser(nik);
+  // check if nik is 8 digits
+  if (!/^\d{8}$/.test(nik)) {
+    return res.status(405).send("nik must be 8 digits");
+  }
+  if (name === null || password === null || name.trim() === "" || password.trim() === "") {
+    return res.status(405).send("name and password must be filled");
+  }
+  // check if user already exists
+  if (checkUser.length !== 0) {
     return res.status(400).send("User already exists");
   }
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password, salt);
-  await pool.query(
-    "INSERT INTO users (name, nik, password) VALUES ($1, $2, $3)",
-    [name, nik, hashedPassword]
-  );
+  const trimmedName = name.trim();
+  const trimmedPassword = password.trim();
+  const hashedPassword = await passwordHash(trimmedPassword);
+  await createUser(trimmedName, nik, hashedPassword);
   return res.json({
     message: "User created successfully",
-    body: { user: { name, nik } },
+    body: { user: { name: trimmedName, nik } },
   });
 };
 
@@ -66,25 +67,19 @@ export const updateUser = async (
   res: Response
 ): Promise<Response> => {
   const nik = parseInt(req.params.nik);
-  const checkUser = await pool.query("SELECT * FROM users WHERE nik = $1", [
-    nik,
-  ]);
-  if (checkUser.rowCount == 0) {
+  const checkUser = await findUser(nik);
+  if (checkUser.length === 0) {
     return res.status(400).send("User doesn't exist");
   }
   var names = req.body.name;
   if (names == null) {
-    names = checkUser.rows[0].name;
+    names = checkUser[0].name;
   }
   const password = req.body.password;
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password, salt);
+  const hashedPassword = await passwordHash(password);
 
-  await pool.query("UPDATE users SET name = $1, password = $2 WHERE nik = $3", [
-    names,
-    hashedPassword,
-    nik,
-  ]);
+  await editUser(names, nik, hashedPassword);
+
   return res.json("User " + nik + " Updated Successfully");
 };
 
@@ -93,37 +88,29 @@ export const deleteUser = async (
   res: Response
 ): Promise<Response> => {
   const nik = parseInt(req.params.nik);
-  const checkUser = await pool.query("SELECT * FROM users WHERE nik = $1", [
-    nik,
-  ]);
-  if (checkUser.rowCount == 0) {
+  const checkUser = await findUser(nik);
+  if (checkUser.length === 0) {
     return res.status(400).send("User doesn't exist");
   }
-  await pool.query("DELETE FROM users WHERE nik = $1", [nik]);
+  await eraseUser(nik);
   return res.json("User " + nik + " has been deleted");
 };
 
 export const login = async (req: Request, res: Response): Promise<Response> => {
   const nik = req.body.nik;
-  const checkUser = await pool.query("SELECT * FROM users WHERE nik = $1", [
-    nik,
-  ]);
-  if (checkUser.rowCount == 0) {
+  const checkUser = await findUser(nik);
+  if (checkUser.length === 0) {
     return res.status(404).send("User doesn't exist");
   }
-  const user: User = checkUser.rows[0];
-  if (!(await bcrypt.compare(req.body.password, user.password))) {
+  const user = checkUser[0];
+  if (!(await comparePassword(req.body.password, user.password))) {
     return res.status(400).send("Not allowed! Incorrect password");
   }
-  const token = await loginUser(user);
-  return res.send({token: token});
+  const token = await generateToken(user);
+  return res.send({ token: token });
 };
 
-// export const profile = (req: Request, res: Response): Response => {
-//   return res.send("Success, authorized!");
-// };
-
 export const protect = (req: Request, res: Response) => {
-    console.log("success!");
-    return res.send("hi");
-}
+  console.log("success!");
+  return res.send("hi");
+};
