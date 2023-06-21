@@ -1,6 +1,15 @@
 import { Request, Response } from "express";
-import { poolMaterial } from "../model";
-import { QueryResult } from "pg";
+import {
+  findAllMaterials,
+  findMaterialsById,
+  findMaterialsByName,
+  setCurrentJakartaTime,
+  findMaterialByIdAndName,
+  createNewMaterial,
+  editMaterial,
+  eraseMaterialsById,
+  eraseMaterialByIdAndName,
+} from "../service/material.service";
 
 export interface Material {
   material_id: number;
@@ -19,13 +28,10 @@ export const getAllMaterials = async (
   res: Response
 ): Promise<Response> => {
   try {
-    const response: QueryResult = await poolMaterial.query(
-      "SELECT id, name, user_nik, to_char(date_added, 'YYYY-MM-DD HH24:MI:SS.MS') AS date_added FROM materials"
-    );
-    return res.status(200).json(response.rows);
+    const materials = await findAllMaterials();
+    return res.status(200).json(materials);
   } catch (e) {
-    console.log(e);
-    return res.status(500).json("Internal Server Error");
+    return res.status(500).json("Internal Server Error " + e);
   }
 };
 
@@ -34,14 +40,11 @@ export const getMaterialsById = async (
   res: Response
 ): Promise<Response> => {
   const id = parseInt(req.params.id);
-  const response: QueryResult = await poolMaterial.query(
-    "SELECT id, name, user_nik, to_char(date_added, 'YYYY-MM-DD HH24:MI:SS.MS') AS date_added FROM materials WHERE id = $1",
-    [id]
-  );
-  if (response.rowCount == 0) {
+  const materials = await findMaterialsById(id);
+  if (materials.length === 0) {
     return res.status(400).send("Material unavailable");
   }
-  return res.json(response.rows);
+  return res.status(200).json(materials);
 };
 
 export const getMaterialsByName = async (
@@ -49,14 +52,11 @@ export const getMaterialsByName = async (
   res: Response
 ): Promise<Response> => {
   const { name } = req.params;
-  const response: QueryResult = await poolMaterial.query(
-    "SELECT id, name, user_nik, to_char(date_added, 'YYYY-MM-DD HH24:MI:SS.MS') AS date_added FROM materials WHERE name = $1",
-    [name]
-  );
-  if (response.rowCount == 0) {
+  const materials = await findMaterialsByName(name);
+  if (materials.length === 0) {
     return res.status(400).send("Material unavailable");
   }
-  return res.json(response.rows);
+  return res.status(200).json(materials);
 };
 
 export const addMaterial = async (
@@ -64,34 +64,29 @@ export const addMaterial = async (
   res: Response
 ): Promise<Response> => {
   const { id, name, user_nik } = req.body;
-  const currentDate = new Date();
-  const timezoneOffset = currentDate.getTimezoneOffset();
-  console.log(timezoneOffset);
-  currentDate.setMinutes(currentDate.getMinutes() - timezoneOffset);
-  const date_added = currentDate.toISOString();
-  const checkMaterial = await poolMaterial.query(
-    "SELECT * FROM materials WHERE name = $1 AND id = $2",
-    [name, id]
-  );
+  const date_added = setCurrentJakartaTime();
   // Check if user_nik is exactly 8 digits
   if (!/^\d{8}$/.test(user_nik)) {
-    return res.status(400).send("user_nik must be 8 digits");
+    return res.status(405).send("user_nik must be 8 digits");
+  }
+  // Check if id is null
+  if (id === null) {
+    return res.status(403).send("id must not be empty");
   }
   // Check if name is empty
-  if (name === "") {
-    return res.status(400).send("name must not be empty");
+  if (name === null || name.trim() === "") {
+    return res.status(406).send("name must not be empty");
   }
-  // Check if user_nik is already registered
-  if (checkMaterial.rowCount != 0) {
+  const material = await findMaterialByIdAndName(id, name.trim());
+  // Check if material exists
+  if (material.length !== 0) {
     return res.status(400).send("Material already exists");
   }
-  await poolMaterial.query(
-    "INSERT INTO materials (id, name, user_nik, date_added) VALUES ($1, $2, $3, $4)",
-    [id, name, user_nik, date_added]
-  );
-  return res.json({
+  const trimmedName = name.trim();
+  await createNewMaterial(id, trimmedName, user_nik, date_added);
+  return res.status(200).json({
     message: "Material added successfully",
-    body: { material: { id, name, user_nik, date_added } },
+    body: { material: { id, name: trimmedName, user_nik, date_added } },
   });
 };
 
@@ -100,22 +95,17 @@ export const updateMaterial = async (
   res: Response
 ): Promise<Response> => {
   const { id, name } = req.params;
-  const checkMaterial = await poolMaterial.query(
-    "SELECT * FROM materials WHERE id = $1 AND name = $2",
-    [id, name]
-  );
-  if (checkMaterial.rowCount == 0) {
+  const checkMaterial = await findMaterialByIdAndName(Number(id), name);
+  // Check if material exists
+  if (checkMaterial.length === 0) {
     return res.status(400).send("Material unavailable");
   }
   const newName = req.body.name;
-  await poolMaterial.query("UPDATE materials SET name = $1 WHERE name = $2 AND id = $3", [
-    newName,
-    name,
-    id,
-  ]);
+  const trimmedNewName = newName.trim();
+  await editMaterial(trimmedNewName, name, Number(id));
   return res.json({
     message: "Material updated successfully",
-    body: { material: { id, newName } },
+    body: { material: { id, trimmedNewName } },
   });
 };
 
@@ -124,14 +114,12 @@ export const deleteMaterialList = async (
   res: Response
 ): Promise<Response> => {
   const id = req.params.id;
-  const checkMaterial = await poolMaterial.query(
-    "SELECT * FROM materials WHERE id = $1",
-    [id]
-  );
-  if (checkMaterial.rowCount == 0) {
+  const checkMaterial = await findMaterialsById(Number(id));
+  // Check if material exists
+  if (checkMaterial.length === 0) {
     return res.status(400).send("Material unavailable");
   }
-  await poolMaterial.query("DELETE FROM materials WHERE id = $1", [id]);
+  await eraseMaterialsById(Number(id));
   return res.json({
     message: "Material List deleted successfully",
     body: { material: { id } },
@@ -143,19 +131,15 @@ export const deleteMaterial = async (
   res: Response
 ): Promise<Response> => {
   const { id, name } = req.body;
-  const checkMaterial = await poolMaterial.query(
-    "SELECT * FROM materials WHERE id = $1 AND name = $2",
-    [id, name]
-  );
-  if (checkMaterial.rowCount == 0) {
+  const trimmedName = name.trim();
+  const checkMaterial = await findMaterialByIdAndName(Number(id), trimmedName);
+  // Check if material exists
+  if (checkMaterial.length == 0) {
     return res.status(400).send("Material unavailable");
   }
-  await poolMaterial.query(
-    "DELETE FROM materials WHERE id = $1 AND name = $2",
-    [id, name]
-  );
+  await eraseMaterialByIdAndName(id, trimmedName);
   return res.json({
     message: "Material deleted successfully",
-    body: { material: { id, name } },
+    body: { material: { id, name: trimmedName } },
   });
 };

@@ -2,7 +2,7 @@ import { Router } from "express";
 import {
   getUsers,
   getUserByNik,
-  createUser,
+  signupUser,
   updateUser,
   deleteUser,
   login,
@@ -15,7 +15,7 @@ const router = Router();
 
 router.get("/users", getUsers);
 router.get("/users/:nik", getUserByNik);
-router.post("/users/signup", createUser);
+router.post("/users/signup", signupUser);
 router.put("/users/:nik", updateUser);
 router.delete("/users/:nik", deleteUser);
 router.post("/users/login", login);
