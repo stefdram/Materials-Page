@@ -58,7 +58,7 @@ const comparePassword = async (password: string, hashedPassword: string) => {
 const generateToken = async (user: User) => {
   // jwt token provision
   const payload = { nik: user.nik, name: user.name };
-  const token = jwt.sign(payload, "Random string", { expiresIn: "2h" });
+  const token = jwt.sign(payload, "Random string", { expiresIn: "1h" });
   return token;
 };
 
