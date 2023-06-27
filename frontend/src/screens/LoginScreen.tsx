@@ -36,9 +36,10 @@ const LoginScreen = () => {
     }
     const data = await response.json();
     const token = data.token;
-    console.log(token);
+    const expirationTime = new Date().getTime() + 3600 * 1000; // 1 hour from now
     localStorage.setItem("token", token);
     localStorage.setItem("NIK", NIK);
+    localStorage.setItem("expiry", expirationTime.toString());
     setNIK("");
     setPassword("");
     navigate("/materials");
