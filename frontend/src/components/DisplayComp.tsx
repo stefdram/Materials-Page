@@ -1,7 +1,4 @@
-import {
-  TextField,
-  Box,
-} from "@mui/material";
+import { TextField, Box } from "@mui/material";
 import React, { useState } from "react";
 import DialogComp from "./DialogComp";
 import MaterialListComp from "./MaterialListComp";
@@ -62,7 +59,9 @@ const DisplayComp: React.FC<props> = ({ idArr, onDelete }) => {
               inputMode: "numeric",
               pattern: "[0-9]*",
             }}
-            onKeyDown={(evt) => ["e", "E", "+", "-"].includes(evt.key) && evt.preventDefault()} // prevents e, E, +, - in input
+            onKeyDown={(evt) =>
+              ["e", "E", "+", "-"].includes(evt.key) && evt.preventDefault()
+            } // prevents e, E, +, - in input
           />
           <DialogComp idArr={idArr} onDelete={onDelete} />
         </div>

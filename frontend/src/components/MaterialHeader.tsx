@@ -6,6 +6,7 @@ const MaterialHeader = () => {
     event.preventDefault();
     localStorage.removeItem("token");
     localStorage.removeItem("NIK");
+    localStorage.removeItem("expiry");
     window.location.href = "/";
   }
     return (
