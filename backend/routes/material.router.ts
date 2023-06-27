@@ -4,6 +4,7 @@ import {
   getAllMaterials,
   getMaterialsById,
   getMaterialsByName,
+  getAllIds,
   addMaterial,
   updateMaterial,
   deleteMaterialList,
@@ -16,6 +17,7 @@ const materialRouter = Router();
 
 materialRouter.get("/test", test);
 materialRouter.get("/materials", passport.authenticate('jwt', { session: false }), getAllMaterials);
+materialRouter.get("/materials/get/ids", passport.authenticate('jwt', { session: false }), getAllIds);
 materialRouter.get("/materials/:id", passport.authenticate('jwt', { session: false }), getMaterialsById);
 materialRouter.get("/materials/by/:name", passport.authenticate('jwt', { session: false }), getMaterialsByName);
 materialRouter.post("/materials/add", passport.authenticate('jwt', { session: false }), addMaterial);

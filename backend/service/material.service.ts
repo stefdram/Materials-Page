@@ -32,6 +32,13 @@ const findMaterialsByName = async (name: string): Promise<Material[]> => {
   return response.rows;
 };
 
+const findAllIds = async (): Promise<number[]> => {
+  const response: QueryResult = await poolMaterial.query(
+    "SELECT DISTINCT id FROM materials"
+  );
+  return response.rows.map((row) => row.id);
+};
+
 const setCurrentJakartaTime = () => {
   const currentDate = new Date();
   const timezoneOffset = currentDate.getTimezoneOffset();
@@ -88,6 +95,7 @@ export {
   findMaterialsByName,
   setCurrentJakartaTime,
   findMaterialByIdAndName,
+  findAllIds,
   createNewMaterial,
   editMaterial,
   eraseMaterialsById,

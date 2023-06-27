@@ -5,6 +5,7 @@ import {
   findMaterialsByName,
   setCurrentJakartaTime,
   findMaterialByIdAndName,
+  findAllIds,
   createNewMaterial,
   editMaterial,
   eraseMaterialsById,
@@ -57,6 +58,18 @@ export const getMaterialsByName = async (
     return res.status(400).send("Material unavailable");
   }
   return res.status(200).json(materials);
+};
+
+export const getAllIds = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    const ids = await findAllIds();
+    return res.status(200).json(ids);
+  } catch (e) {
+    return res.status(500).json("Internal Server Error " + e);
+  }
 };
 
 export const addMaterial = async (
