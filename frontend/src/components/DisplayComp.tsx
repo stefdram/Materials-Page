@@ -1,5 +1,5 @@
 import { TextField, Box } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import DialogComp from "./DialogComp";
 import MaterialListComp from "./MaterialListComp";
 
@@ -11,6 +11,10 @@ type props = {
 const DisplayComp: React.FC<props> = ({ idArr, onDelete }) => {
   const [id, setId] = useState("");
   const [description, setDescription] = useState("");
+
+  useEffect(() => {
+    setId(idArr);
+  }, [idArr]);
 
   const handleIdChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setId(event.target.value);
