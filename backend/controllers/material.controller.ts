@@ -13,7 +13,6 @@ import {
 } from "../service/material.service";
 
 export interface Material {
-  material_id: number;
   id: number;
   name: string;
   user_nik: number;
