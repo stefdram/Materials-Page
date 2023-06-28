@@ -16,6 +16,29 @@ const DisplayComp: React.FC<props> = ({ idArr, onDelete }) => {
     setId(idArr);
   }, [idArr]);
 
+  useEffect(() => {
+    const fetchDescription = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:4001/materials/get/description/${id}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        const data = await response.json();
+        setDescription(data);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    fetchDescription();
+  }, [id]);
+
+
   const handleIdChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setId(event.target.value);
   };
