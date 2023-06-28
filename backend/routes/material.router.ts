@@ -64,18 +64,22 @@ materialRouter.delete(
 );
 materialRouter.get(
   "/materials/get/all-descriptions",
+  passport.authenticate("jwt", { session: false }),
   getAllDescriptions
 )
 materialRouter.get(
   "/materials/get/description/:id",
+  passport.authenticate("jwt", { session: false }),
   getDescriptionsById
 )
 materialRouter.put(
   "/materials/edit/description",
+  passport.authenticate("jwt", { session: false }),
   editOrCreateDescriptions
 )
 materialRouter.delete(
   "/materials/delete/description/:id",
+  passport.authenticate("jwt", { session: false }),
   eraseDescriptionsById
 )
 
