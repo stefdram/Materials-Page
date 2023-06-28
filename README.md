@@ -25,5 +25,5 @@ DB_MATERIAL_PORT="yourportnumber"
 4. Go to http://localhost:3000 to see the webpage. 
 
 Notes: 
-- Some of material page's components has been integrated with the backend (id and description). Last integration is for the list of materials.
+- Some of material page's components have been integrated with the backend (id and description). Last integration is for the list of materials.
 - Home page is subject to change for better design.
