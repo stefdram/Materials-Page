@@ -1,13 +1,13 @@
 import { poolMaterial } from "../model";
 import { QueryResult } from "pg";
+import { Material } from "../controllers/material.controller";
 
-interface Material {
-  material_id: number;
-  id: number;
-  name: string;
-  user_nik: number;
-  date_added: Date;
-}
+// interface Material {
+//   id: number;
+//   name: string;
+//   user_nik: number;
+//   date_added: Date;
+// }
 
 const findAllMaterials = async (): Promise<Material[]> => {
   const response: QueryResult = await poolMaterial.query(
