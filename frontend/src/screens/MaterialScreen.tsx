@@ -22,8 +22,6 @@ const MaterialScreen = () => {
     return data;
   };
 
-  const ids = listIds();
-
   // const [basicDisplay, setBasicDisplay] = useState<JSX.Element[]>([
   //   <DisplayComp idArr={Math.random().toString()} onDelete={handleDelete} />,
   // ]);
