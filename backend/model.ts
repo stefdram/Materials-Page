@@ -69,3 +69,21 @@ const createMaterialTableQuery = `
     client.release();
   }
 })();
+
+const createDescriptionTableQuery = `
+  CREATE TABLE IF NOT EXISTS descriptions (
+    id integer PRIMARY KEY,
+    description text
+  );
+`;
+
+(async () => {
+  const client = await poolMaterial.connect();
+  try {
+    await client.query(createDescriptionTableQuery);
+  } catch (error) {
+    console.error("Error creating descriptions table:", error);
+  } finally {
+    client.release();
+  }
+})();

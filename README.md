@@ -25,6 +25,5 @@ DB_MATERIAL_PORT="yourportnumber"
 4. Go to http://localhost:3000 to see the webpage. 
 
 Notes: 
-- Signup and Login page is working, but the token is not being used yet. The token will be used to authenticate the user and to access the material page.
-- The material page has not yet been integrated with the backend. The material page is currently using a mock data.
+- Some of material page's components have been integrated with the backend (id and description). Last integration is for the list of materials.
 - Home page is subject to change for better design.

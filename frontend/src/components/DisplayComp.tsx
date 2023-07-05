@@ -1,8 +1,5 @@
-import {
-  TextField,
-  Box,
-} from "@mui/material";
-import React, { useState } from "react";
+import { TextField, Box } from "@mui/material";
+import React, { useEffect, useState } from "react";
 import DialogComp from "./DialogComp";
 import MaterialListComp from "./MaterialListComp";
 
@@ -14,6 +11,33 @@ type props = {
 const DisplayComp: React.FC<props> = ({ idArr, onDelete }) => {
   const [id, setId] = useState("");
   const [description, setDescription] = useState("");
+
+  useEffect(() => {
+    setId(idArr);
+  }, [idArr]);
+
+  useEffect(() => {
+    const fetchDescription = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:4001/materials/get/description/${id}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        const data = await response.json();
+        setDescription(data);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    fetchDescription();
+  }, [id]);
+
 
   const handleIdChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setId(event.target.value);
@@ -62,7 +86,9 @@ const DisplayComp: React.FC<props> = ({ idArr, onDelete }) => {
               inputMode: "numeric",
               pattern: "[0-9]*",
             }}
-            onKeyDown={(evt) => ["e", "E", "+", "-"].includes(evt.key) && evt.preventDefault()} // prevents e, E, +, - in input
+            onKeyDown={(evt) =>
+              ["e", "E", "+", "-"].includes(evt.key) && evt.preventDefault()
+            } // prevents e, E, +, - in input
           />
           <DialogComp idArr={idArr} onDelete={onDelete} />
         </div>
@@ -79,7 +105,7 @@ const DisplayComp: React.FC<props> = ({ idArr, onDelete }) => {
             onChange={handleDescriptionChange}
           />
         </div>
-        <MaterialListComp />
+        <MaterialListComp id={idArr}/>
       </Box>
     </div>
   );
