@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ListItemButton,
   ListItemIcon,
@@ -22,13 +22,35 @@ import CollectionsIcon from "@mui/icons-material/Collections";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import MenuIcon from "@mui/icons-material/Menu";
 
-const MaterialListComp = () => {
+type props = {
+  id: string;
+};
+
+const MaterialListComp: React.FC<props> = ({ id }) => {
   const [open, setOpen] = useState(false);
   const [addList, setAddList] = useState(false);
   const [itemName, setItemName] = useState("");
   const [materialList, setMaterialList] = useState<string[]>([]);
   const [openMenuList, setOpenMenuList] = useState<(null | HTMLElement)[]>([]);
   const [openEdit, setOpenEdit] = useState(false);
+
+  const listItems = async () => {
+    const response = await fetch(
+      `http://localhost:4001/materials/${Number(id)}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+    const data = await response.json();
+    setMaterialList(data.map((item: any) => item.name));
+  };
+
+  useEffect(() => {
+    listItems();
+  }, [id]);
 
   const handleOpenClick = () => {
     setOpen(!open);
@@ -69,7 +91,7 @@ const MaterialListComp = () => {
     }
     setMaterialList((prevList) => {
       const updatedList = [...prevList];
-      updatedList[index] = itemName;
+      updatedList[index] = itemName.toLowerCase();
       return updatedList;
     });
     setItemName("");
@@ -92,7 +114,7 @@ const MaterialListComp = () => {
       alert("Please enter a name for the item");
       return;
     }
-    setMaterialList([...materialList, itemName]);
+    setMaterialList([...materialList, itemName.toLowerCase()]);
     setItemName("");
     setAddList(false);
   };

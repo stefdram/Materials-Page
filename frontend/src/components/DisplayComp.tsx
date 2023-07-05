@@ -105,7 +105,7 @@ const DisplayComp: React.FC<props> = ({ idArr, onDelete }) => {
             onChange={handleDescriptionChange}
           />
         </div>
-        <MaterialListComp />
+        <MaterialListComp id={idArr}/>
       </Box>
     </div>
   );
