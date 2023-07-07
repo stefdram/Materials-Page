@@ -2,8 +2,11 @@ import React, { useEffect, useState } from "react";
 import MaterialHeader from "../components/MaterialHeader";
 import { Button } from "@mui/material";
 import DisplayComp from "../components/DisplayComp"; //The box for each material type-specific
+import AddNewMaterial from "../components/AddNewMaterial";
 
 const MaterialScreen = () => {
+  const [basicDisplay, setBasicDisplay] = useState<JSX.Element[]>([]);
+
   const handleDelete = (idArr: string) => {
     setBasicDisplay((prevDisplay) => {
       const updatedDisplay = prevDisplay.filter(
@@ -22,12 +25,6 @@ const MaterialScreen = () => {
     return data;
   };
 
-  // const [basicDisplay, setBasicDisplay] = useState<JSX.Element[]>([
-  //   <DisplayComp idArr={Math.random().toString()} onDelete={handleDelete} />,
-  // ]);
-
-  const [basicDisplay, setBasicDisplay] = useState<JSX.Element[]>([]);
-
   useEffect(() => {
     const fetchIds = async () => {
       try {
@@ -44,30 +41,17 @@ const MaterialScreen = () => {
     fetchIds();
   }, []);
 
-  const handleAddButtonClick = () => {
-    const randomInt = Math.random().toString();
-    setBasicDisplay([
-      ...basicDisplay,
-      <DisplayComp idArr={randomInt} onDelete={handleDelete} />,
-    ]);
-  };
-
   return (
     <div>
       <MaterialHeader />
       {basicDisplay.map((display) => (
         <React.Fragment key={display.props.idArr}>{display}</React.Fragment>
       ))}
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        <Button
-          variant="contained"
-          color="success"
-          onClick={handleAddButtonClick}
-          style={{ marginTop: "10px", marginBottom: "30px" }}
-        >
-          Add Material
-        </Button>
-      </div>
+      <AddNewMaterial
+        basicDisplay={basicDisplay}
+        setBasicDisplay={setBasicDisplay}
+        onDelete={handleDelete}
+      />
     </div>
   );
 };

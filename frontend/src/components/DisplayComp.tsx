@@ -1,6 +1,6 @@
 import { TextField, Box } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import DialogComp from "./DialogComp";
+import DeleteDialog from "./DeleteDialogComp";
 import MaterialListComp from "./MaterialListComp";
 
 type props = {
@@ -20,7 +20,7 @@ const DisplayComp: React.FC<props> = ({ idArr, onDelete }) => {
     const fetchDescription = async () => {
       try {
         const response = await fetch(
-          `http://localhost:4001/materials/get/description/${id}`,
+          `http://localhost:4001/materials/get/description/${idArr}`,
           {
             method: "GET",
             headers: {
@@ -37,7 +37,6 @@ const DisplayComp: React.FC<props> = ({ idArr, onDelete }) => {
 
     fetchDescription();
   }, [id]);
-
 
   const handleIdChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setId(event.target.value);
@@ -89,8 +88,9 @@ const DisplayComp: React.FC<props> = ({ idArr, onDelete }) => {
             onKeyDown={(evt) =>
               ["e", "E", "+", "-"].includes(evt.key) && evt.preventDefault()
             } // prevents e, E, +, - in input
+            disabled
           />
-          <DialogComp idArr={idArr} onDelete={onDelete} />
+          <DeleteDialog idArr={idArr} onDelete={onDelete} />
         </div>
         <div style={{ marginTop: "13px", marginBottom: "10px" }}>
           <TextField
@@ -99,13 +99,14 @@ const DisplayComp: React.FC<props> = ({ idArr, onDelete }) => {
             label="Description"
             size="small"
             multiline
+            disabled
             rows={4}
             value={description}
             sx={{ width: "4in", backgroundColor: "white" }}
             onChange={handleDescriptionChange}
           />
         </div>
-        <MaterialListComp id={idArr}/>
+        <MaterialListComp id={idArr} />
       </Box>
     </div>
   );

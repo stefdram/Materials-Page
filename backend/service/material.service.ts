@@ -34,9 +34,22 @@ const findMaterialsByName = async (name: string): Promise<Material[]> => {
 
 const findAllIds = async (): Promise<number[]> => {
   const response: QueryResult = await poolMaterial.query(
-    "SELECT DISTINCT id FROM materials"
+    "SELECT DISTINCT id, MIN(date_added) AS date_added FROM materials GROUP BY id"
   );
-  return response.rows.map((row) => row.id);
+  const sortedRows = response.rows.sort((a, b) => {
+    const dateA = new Date(a.date_added);
+    const dateB = new Date(b.date_added);
+
+    if (dateA < dateB) {
+      return -1;
+    }
+    if (dateA > dateB) {
+      return 1;
+    }
+    return 0;
+  });
+  
+  return sortedRows.map((row) => row.id);
 };
 
 const setCurrentJakartaTime = () => {
