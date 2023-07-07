@@ -14,15 +14,22 @@ type props = {
   onDelete: (idArr: string) => void;
 };
 
-const DialogComp: React.FC<props> = ({ idArr, onDelete }) => {
+const DeleteDialog: React.FC<props> = ({ idArr, onDelete }) => {
   const [showConfirmation, setShowConfirmation] = useState(false);
 
   const handleDeleteClick = () => {
     setShowConfirmation(true);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     // Perform deletion logic here
+    await fetch(`http://localhost:4001/materials/deletelist/${idArr}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
     onDelete(idArr);
     setShowConfirmation(false);
   };
@@ -58,4 +65,4 @@ const DialogComp: React.FC<props> = ({ idArr, onDelete }) => {
   );
 };
 
-export default DialogComp;
+export default DeleteDialog;
