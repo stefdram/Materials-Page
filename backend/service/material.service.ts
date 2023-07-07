@@ -36,7 +36,6 @@ const findAllIds = async (): Promise<number[]> => {
   const response: QueryResult = await poolMaterial.query(
     "SELECT DISTINCT id, MIN(date_added) AS date_added FROM materials GROUP BY id"
   );
-  // return response.rows.map((row) => row.id);
   const sortedRows = response.rows.sort((a, b) => {
     const dateA = new Date(a.date_added);
     const dateB = new Date(b.date_added);
