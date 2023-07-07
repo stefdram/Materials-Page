@@ -41,6 +41,18 @@ const AddNewMaterial: React.FC<props> = ({
       alert("Please fill in all fields.");
       return;
     }
+    const test = await fetch("http://localhost:4001/materials/get/ids", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    const data = await test.json();
+    if (data.includes(Number(id))) {
+      alert("id already exists!");
+      return;
+    }
     const responseOne = await fetch("http://localhost:4001/materials/add", {
       method: "POST",
       headers: {
@@ -94,15 +106,16 @@ const AddNewMaterial: React.FC<props> = ({
         <DialogTitle>Add New Material</DialogTitle>
         <DialogContent>
           <DialogContentText
-          onKeyDown={(e: React.KeyboardEvent) => {
-            if (e.key === "Enter") {
-              handleSubmitAdd(e);
-            } else {
-              e.stopPropagation();
-            }
-          }}>
+            onKeyDown={(e: React.KeyboardEvent) => {
+              if (e.key === "Enter") {
+                handleSubmitAdd(e);
+              } else {
+                e.stopPropagation();
+              }
+            }}
+          >
             This new item will be added to the database.
-            <div/>
+            <div />
             <TextField
               id="id"
               name="id"
@@ -114,7 +127,7 @@ const AddNewMaterial: React.FC<props> = ({
                 inputMode: "numeric",
                 pattern: "[0-9]*",
               }}
-              sx = {{marginTop: "13px"}}
+              sx={{ marginTop: "13px" }}
               onKeyDown={(evt) =>
                 ["e", "E", "+", "-"].includes(evt.key) && evt.preventDefault()
               } // prevents e, E, +, - in input
@@ -127,7 +140,7 @@ const AddNewMaterial: React.FC<props> = ({
               size="small"
               multiline
               rows={4}
-              sx={{ width: "4in", marginTop: "13px", marginBottom: "10px"}}
+              sx={{ width: "4in", marginTop: "13px", marginBottom: "10px" }}
               onChange={(e) => setDescription(e.target.value)}
             />
             <TextField
