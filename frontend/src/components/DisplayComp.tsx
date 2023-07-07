@@ -1,6 +1,6 @@
 import { TextField, Box } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import DialogComp from "./DialogComp";
+import DeleteDialog from "./DeleteDialogComp";
 import MaterialListComp from "./MaterialListComp";
 
 type props = {
@@ -89,8 +89,9 @@ const DisplayComp: React.FC<props> = ({ idArr, onDelete }) => {
             onKeyDown={(evt) =>
               ["e", "E", "+", "-"].includes(evt.key) && evt.preventDefault()
             } // prevents e, E, +, - in input
+            disabled
           />
-          <DialogComp idArr={idArr} onDelete={onDelete} />
+          <DeleteDialog idArr={idArr} onDelete={onDelete} />
         </div>
         <div style={{ marginTop: "13px", marginBottom: "10px" }}>
           <TextField
@@ -99,6 +100,7 @@ const DisplayComp: React.FC<props> = ({ idArr, onDelete }) => {
             label="Description"
             size="small"
             multiline
+            disabled
             rows={4}
             value={description}
             sx={{ width: "4in", backgroundColor: "white" }}
