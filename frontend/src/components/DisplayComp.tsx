@@ -20,7 +20,7 @@ const DisplayComp: React.FC<props> = ({ idArr, onDelete }) => {
     const fetchDescription = async () => {
       try {
         const response = await fetch(
-          `http://localhost:4001/materials/get/description/${id}`,
+          `http://localhost:4001/materials/get/description/${idArr}`,
           {
             method: "GET",
             headers: {
@@ -37,7 +37,6 @@ const DisplayComp: React.FC<props> = ({ idArr, onDelete }) => {
 
     fetchDescription();
   }, [id]);
-
 
   const handleIdChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setId(event.target.value);
@@ -107,7 +106,7 @@ const DisplayComp: React.FC<props> = ({ idArr, onDelete }) => {
             onChange={handleDescriptionChange}
           />
         </div>
-        <MaterialListComp id={idArr}/>
+        <MaterialListComp id={idArr} />
       </Box>
     </div>
   );

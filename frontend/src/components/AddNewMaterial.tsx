@@ -93,7 +93,14 @@ const AddNewMaterial: React.FC<props> = ({
       <Dialog open={showConfirmation} onClose={handleCancelAdd}>
         <DialogTitle>Add New Material</DialogTitle>
         <DialogContent>
-          <DialogContentText>
+          <DialogContentText
+          onKeyDown={(e: React.KeyboardEvent) => {
+            if (e.key === "Enter") {
+              handleSubmitAdd(e);
+            } else {
+              e.stopPropagation();
+            }
+          }}>
             This new item will be added to the database.
             <div/>
             <TextField
