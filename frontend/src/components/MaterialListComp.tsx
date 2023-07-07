@@ -84,14 +84,26 @@ const MaterialListComp: React.FC<props> = ({ id }) => {
     setOpenEdit(false);
   };
 
-  const handleEditItem = (index: number) => {
+  const handleEditItem = async (index: number) => {
     if (itemName === "") {
       alert("Please enter a name for the item");
       return;
     }
+    const currentName = materialList[index];
+    const newName = itemName.toLowerCase().trim();
+    await fetch(`http://localhost:4001/materials/edit/${id}/${currentName}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify({
+        name: newName,
+      }),
+    });
     setMaterialList((prevList) => {
       const updatedList = [...prevList];
-      updatedList[index] = itemName.toLowerCase();
+      updatedList[index] = newName;
       return updatedList;
     });
     setItemName("");
@@ -99,7 +111,19 @@ const MaterialListComp: React.FC<props> = ({ id }) => {
     handleCloseMenuList(index);
   };
 
-  const handleDeleteItem = (index: number) => {
+  const handleDeleteItem = async (index: number) => {
+    const itemName = materialList[index];
+    await fetch(`http://localhost:4001/materials/deleteone`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify({
+        id: id,
+        name: itemName,
+      }),
+    });
     setMaterialList((prevList) => {
       const updatedList = [...prevList];
       updatedList.splice(index, 1);
@@ -109,9 +133,27 @@ const MaterialListComp: React.FC<props> = ({ id }) => {
     handleCloseMenuList(index);
   };
 
-  const handleAddList = () => {
+  const handleAddList = async () => {
     if (itemName === "") {
       alert("Please enter a name for the item");
+      return;
+    }
+    const newItemName = itemName.toLowerCase().trim();
+    const userNik = localStorage.getItem("NIK");
+    const response = await fetch("http://localhost:4001/materials/add", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify({
+        id: id,
+        name: newItemName,
+        user_nik: userNik,
+      }),
+    });
+    if (response.status === 400) {
+      alert("Material name with this ID already exists");
       return;
     }
     setMaterialList([...materialList, itemName.toLowerCase()]);

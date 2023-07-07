@@ -30,6 +30,13 @@ const DeleteDialog: React.FC<props> = ({ idArr, onDelete }) => {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     })
+    await fetch(`http://localhost:4001/materials/delete/description/${idArr}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
     onDelete(idArr);
     setShowConfirmation(false);
   };
