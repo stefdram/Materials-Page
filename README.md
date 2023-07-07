@@ -25,5 +25,5 @@ DB_MATERIAL_PORT="yourportnumber"
 4. Go to http://localhost:3000 to see the webpage. 
 
 Notes: 
-- Integrate backend with the frontend UI/UX for storing, deleting, and editing materials.
+- Add an edit button for description and integrate with the backend. Then, all should be good.
 - Home page is subject to change for better design.
