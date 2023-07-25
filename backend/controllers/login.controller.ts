@@ -107,7 +107,7 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
     return res.status(400).send("Not allowed! Incorrect password");
   }
   const token = await generateToken(user);
-  return res.send({ token: token });
+  return res.send({ name: user.name, token: token });
 };
 
 export const protect = (req: Request, res: Response) => {
