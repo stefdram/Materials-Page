@@ -7,6 +7,7 @@ import {
   deleteUser,
   login,
   protect,
+  comparePass,
 } from "../controllers/login.controller";
 import passport from "passport";
 import "../config/passport";
@@ -20,5 +21,6 @@ router.put("/users/:nik", updateUser);
 router.delete("/users/:nik", deleteUser);
 router.post("/users/login", login);
 router.get("/test", passport.authenticate('jwt', { session: false }), protect);
+router.post("/compare-password", comparePass)
 
 export default router;

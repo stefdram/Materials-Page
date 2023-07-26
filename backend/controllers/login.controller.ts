@@ -10,7 +10,6 @@ import {
   generateToken,
 } from "../service/login.service";
 
-
 export const getUsers = async (
   req: Request,
   res: Response
@@ -45,7 +44,12 @@ export const signupUser = async (
   if (!/^\d{8}$/.test(nik)) {
     return res.status(405).send("nik must be 8 digits");
   }
-  if (name === null || password === null || name.trim() === "" || password.trim() === "") {
+  if (
+    name === null ||
+    password === null ||
+    name.trim() === "" ||
+    password.trim() === ""
+  ) {
     return res.status(405).send("name and password must be filled");
   }
   // check if user already exists
@@ -114,3 +118,12 @@ export const protect = (req: Request, res: Response) => {
   console.log("success!");
   return res.send("hi");
 };
+
+export const comparePass = async (req: Request, res: Response) => {
+  const userPass = req.body.userPassword;
+  const inputPass = req.body.inputPassword;
+  if (!(await comparePassword(inputPass, userPass))) {
+    return res.send(false);
+  }
+  return res.send(true);
+}

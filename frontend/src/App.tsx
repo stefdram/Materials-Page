@@ -27,10 +27,6 @@ function ProtectedRoute({
   if (token) {
     const expirationTime = Number(localStorage.getItem("expiry"));
     const currentTime = Date.now();
-    console.log(expirationTime);
-    console.log(currentTime);
-    console.log(token);
-    console.log(localStorage.getItem("NIK"));
     if (currentTime > expirationTime) {
       // Redirect to a login page or handle unauthorized access
       localStorage.removeItem("token");
