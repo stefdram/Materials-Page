@@ -12,7 +12,7 @@ const LoginScreen = () => {
   const submitHandler = async (e: SyntheticEvent) => {
     e.preventDefault();
     // interact with the backend using fetch
-    if (NIK === "" || password === "") {
+    if (NIK.trim() === "" || password === "") {
       setError("Please fill in all fields!");
       return;
     }
@@ -36,12 +36,15 @@ const LoginScreen = () => {
     }
     const data = await response.json();
     const token = data.token;
+    const name = data.name;
     const expirationTime = new Date().getTime() + 3600 * 1000; // 1 hour from now
     localStorage.setItem("token", token);
     localStorage.setItem("NIK", NIK);
     localStorage.setItem("expiry", expirationTime.toString());
+    localStorage.setItem("name", name);
     setNIK("");
     setPassword("");
+    setError("");
     navigate("/materials");
   };
 
@@ -55,7 +58,10 @@ const LoginScreen = () => {
             type="number"
             placeholder="Enter NIK"
             value={NIK}
-            onChange={(e) => setNIK(e.target.value)}
+            onChange={(e) => {
+              setNIK(e.target.value);
+              setError("");
+            }}
             min={10000000}
             max={99999999}
           />

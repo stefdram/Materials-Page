@@ -17,6 +17,11 @@ const SignupScreen = () => {
       setError("Please fill in all fields!");
       return;
     }
+    if (password.trim().length < 3) {
+      setError("Password must be at least 3 characters long!");
+      setPassword(password.trim());
+      return;
+    }
     const response = await fetch("http://localhost:4000/users/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -47,7 +52,7 @@ const SignupScreen = () => {
             <Form.Label>Name</Form.Label>
             <Form.Control
               type="text"
-              placeholder="Enter your first name"
+              placeholder="Enter your name"
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
